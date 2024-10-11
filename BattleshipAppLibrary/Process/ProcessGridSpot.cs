@@ -39,7 +39,7 @@ namespace BattleshipAppLibrary.Process
             char currentLetter = char.ToUpper(spotLetter);
             for (i = 1; i <= GameLogic.Alphabet.Length; i++)
             {
-                if (GameLogic.Alphabet[i] == currentLetter)
+                if (GameLogic.Alphabet[i-1] == currentLetter)
                 {
                     return i;
                 }
@@ -54,7 +54,7 @@ namespace BattleshipAppLibrary.Process
             {
                 return GameLogic.Alphabet[spotNumber-1];
             }
-
+            // should not reach here
             return '?';
         }
 
