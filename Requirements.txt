@@ -1,0 +1,79 @@
+					===== BASIC REQUIREMENTS =====
+To build a small, two-player console game that has its roots in the game Battleship from Mattel.   
+There will be a 25-spot grid (A1 – E5).
+Each player will place five pegs on the board to represent their five ships.
+Players will then take turns firing on their opponent’s ships.
+The first person to sink all five ships wins.
+
+					===== EXPANDED REQUIREMENTS =====
+Min 2 players will be allowed.
+Max 2 players will be allowed.
+
+Each player will have a list of exactly [5] GridSpots (FriendlyShips).
+	- Only one ship per spot (overlapping is not allowed).
+Each player will have a list of GridSpots (ShotsTaken).
+	- Only one shot per spot is allowed.
+Each player will have a bool HasShipsLeft that stores if it has any ships left
+
+Each GridSpot will be a class with 3 members: SpotLetter, SpotNumber, isHit.
+	- first number will be the line
+		- user will input e letter (A-E).
+			- this needs to be translated into a number.
+			- maybe an enum will help
+	- second number will be the column
+Each GridSpot will have a flag called isHit.
+
+Each ground will be a matrix of [5][5].
+
+					===== UI DESIGN & GENERAL FLOW =====
+[INIT]
+Get initial data for each player:
+	- "Hello, Player[i]. Please input the locations of your battleships."
+	- Clear console.
+[START TURN]
+	- "Player[i] turn [n]" -> [n] - player[i]'s turn number
+		- Player's turn number will be a ushort.
+
+	- "Please input coordinates for the strike: "
+		- if the coordinates are ok:
+			- if the player hits a target:
+				- update player's targeted ships
+				- clear
+				- "Congratulations! That's a HIT!"
+			- if the player misses:
+				- update player's targeted ships
+				- clear
+				- "Bummer! That's a MISS!"
+		- else
+			- "Please input coordinates like this: "E5 (Letter from A-E. Number from 1-5)"
+			- "Coordinates for the strike: "
+			
+	- Display two matrices (one below the other with two newlines between them)
+		- the above one is the targetground
+			- the targetground will start by displaying 'o' everywhere
+
+		- the below one is the homeground
+		
+		- each column will be separated by a whitespace ' '
+		- hits will be displayed on both grounds with 'X'
+		- empty spaces will be displayed on both grounds with 'o'
+		- own ships will be displayed on homeground with '#'
+		- missed hits will be displayed with '*'
+	
+	- "Press enter to end turn."
+[END TURN]
+	- if the next player has any ships left:
+		- continue
+	- else
+		- clear
+		- "Congratulations! You won!"
+		- display the two matrices.
+		- wait for user input to close app
+	
+		
+  1 2 3 4 5	
+A * * * * *
+B o o o o o 
+C o X o o o 
+D o o o # o
+E o # o o o 

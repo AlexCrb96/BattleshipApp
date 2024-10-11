@@ -1,0 +1,13 @@
+Method: Ask for name
+Method: Get ship placement
+Method: Determine if valid spot for ship
+
+Storing ships info:	List per user?
+Storing shots info: List per user?
+
+Method: create the grid for each user.
+Method: print out grid
+Method: fire on opponent
+Method: determine if a shot can be taken & outcome
+Method: display score
+Method: print winner and shots taken 

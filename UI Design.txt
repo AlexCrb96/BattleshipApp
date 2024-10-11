@@ -1,0 +1,28 @@
+Welcome message
+
+Ask player 1 for their name
+Ask player 1 for their 5 ship placements
+	Ask for placements
+	Determine if it is a valid spot
+	Store
+	Clear
+	
+Repeat for player 2
+
+Display grid of where player 1 has fired
+
+Ask player1 where to shoot
+	Verify if it is a valid spot
+	Check hit or miss
+	Store shot
+	Clear
+	
+Display the score (player1: 2 ships left, player 2: 4 ships left)
+
+Repeat for player 2
+
+Loop until someone wins
+Print winnier's name and number of shots taken
+
+wait for user input
+exit
