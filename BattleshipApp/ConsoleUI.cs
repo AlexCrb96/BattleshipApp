@@ -212,7 +212,7 @@ namespace BattleshipApp
             return friendlyShips;
         }
 
-        private static GridSpotModel AskForCoordinates(List<GridSpotModel> friendlyShips, bool isStrike, int shipNumber = 0)
+        private static GridSpotModel AskForCoordinates(List<GridSpotModel> spots, bool isStrike, int shipNumber = 0)
         {
             GridSpotModel spot = new GridSpotModel();
             if (isStrike)
@@ -225,7 +225,7 @@ namespace BattleshipApp
             }
             string input = Console.ReadLine();
             spot = ExtractCoordinates(input);
-            while (ProcessGridSpot.IsSpotTaken(friendlyShips, spot))
+            while (ProcessGridSpot.IsSpotTaken(spots, spot))
             {
                 if (isStrike)
                 {

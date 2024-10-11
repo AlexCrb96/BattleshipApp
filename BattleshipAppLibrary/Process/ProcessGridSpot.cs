@@ -10,10 +10,9 @@ namespace BattleshipAppLibrary.Process
 {
     public static class ProcessGridSpot
     {
-        public static bool IsSpotTaken(List<GridSpotModel> friendlyShips, GridSpotModel newShip)
+        public static bool IsSpotTaken(List<GridSpotModel> spots, GridSpotModel newSpot)
         {
-            return friendlyShips.Any(ship => char.ToUpper(ship.SpotLetter) == char.ToUpper(newShip.SpotLetter)) &&
-                                friendlyShips.Any(ship => ship.SpotNumber == newShip.SpotNumber);
+            return spots.Any(spot => char.ToUpper(spot.SpotLetter) == char.ToUpper(newSpot.SpotLetter) && spot.SpotNumber == newSpot.SpotNumber);
         }
 
         public static Match IsValidInput (string input)
