@@ -12,8 +12,8 @@ namespace BattleshipAppLibrary.Process
     {
         public static bool IsSpotTaken(List<GridSpotModel> friendlyShips, GridSpotModel newShip)
         {
-            return friendlyShips.Any(ship => char.ToUpper(ship.SpotLetter) == char.ToUpper(newShip.SpotLetter)) &&
-                                friendlyShips.Any(ship => ship.SpotNumber == newShip.SpotNumber);
+            return friendlyShips.Any(ship => char.ToUpper(ship.SpotLetter) == char.ToUpper(newShip.SpotLetter)
+                   && ship.SpotNumber == newShip.SpotNumber);
         }
 
         public static Match IsValidInput (string input)
