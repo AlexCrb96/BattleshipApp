@@ -1,4 +1,5 @@
-﻿using BattleshipAppLibrary.Models;
+﻿using BattleshipAppLibrary;
+using BattleshipAppLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,9 @@ namespace BattleshipApp
         static void Main(string[] args)
         {
             ConsoleUI.InitGame();
-            bool isGameOver = ConsoleUI.RunGame();
-            if (isGameOver)
-            {
-                ConsoleUI.ExitGame();
-            }
+            ConsoleUI.RunGame();
+            ConsoleUI.ExitGame();
+
         }
     }
 }

@@ -15,10 +15,14 @@ namespace BattleshipAppLibrary.Process
             return spots.Any(spot => char.ToUpper(spot.SpotLetter) == char.ToUpper(newSpot.SpotLetter) && spot.SpotNumber == newSpot.SpotNumber);
         }
 
-        public static Match IsValidInput (string input)
+        public static GridSpotModel InitSpot(char letter, ushort number)
         {
-            string regexPattern = $@"\[?\s*([{char.ToUpper(GameLogic.MinNumberOfLines)}-{char.ToUpper(GameLogic.MaxNumberOfLines)}{char.ToLower(GameLogic.MinNumberOfLines)}-{char.ToLower(GameLogic.MaxNumberOfLines)}])\s*\]?\s*-?\s*\[?\s*([{GameLogic.MinNumberOfColumns}-{GameLogic.MaxNumberOfColumns}])\s*\]?";
-            return Regex.Match(input, regexPattern);
+            GridSpotModel output = new GridSpotModel();
+            output.SpotLetter = letter;
+            output.SpotNumber = number;
+            output.IsHit = false;
+
+            return output;
         }
 
         public static bool IsHit (GridSpotModel strikeSpot, GridSpotModel enemyShip)
@@ -57,9 +61,9 @@ namespace BattleshipAppLibrary.Process
             return '?';
         }
 
-        public static GridSpotModel SpotFound(char spotLetter, ushort spotNumber, List<GridSpotModel> spots)
+        public static GridSpotModel FindSpot(char spotLetter, ushort spotNumber, List<GridSpotModel> spots)
         {
-            GridSpotModel currentSpot = new GridSpotModel();
+            GridSpotModel currentSpot = null;
 
             foreach (GridSpotModel spot in spots)
             {

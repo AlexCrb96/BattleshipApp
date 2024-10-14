@@ -22,124 +22,142 @@ namespace BattleshipApp
         public static void InitGame()
         {
             GameLogic.Players = new List<PlayerModel>(GameLogic.MaxNumberOfPlayers);
-            for (ushort playerNo = 1; playerNo <= GameLogic.MaxNumberOfPlayers; playerNo++)
+            for (ushort playerNo = 0; playerNo < GameLogic.MaxNumberOfPlayers; playerNo++)
             {
                 PlayerModel newPlayer = CreatePlayer(playerNo);
-                GameLogic.Players.Add(newPlayer);
-                Console.Clear();
+                WaitForInput("Press enter to continue.");
             }
             
         }
 
-        public static bool RunGame()
+        public static void RunGame()
         {
-            ushort turnNumber = 1;
-            bool isGameOver = false;
-
-            while (!GameLogic.IsDone() && !isGameOver)
+            GameLogic.TurnNumber = 1;
+            GameLogic.IsGameOver = false;
+            ushort playerNo = 0;
+            while (!GameLogic.IsGameOver)
             {
-                for (ushort playerNo = 0; playerNo < GameLogic.MaxNumberOfPlayers; playerNo++)
+                for (playerNo = 0; playerNo < GameLogic.MaxNumberOfPlayers; playerNo++)
                 {
                     PlayerModel currentPlayer = GameLogic.Players[playerNo];
-                    Console.WriteLine($"Player{playerNo + 1} turn {turnNumber}.\n");
+                    Console.WriteLine($"Player{playerNo + 1} turn {GameLogic.TurnNumber}.");
+                    DisplayLegend();
+                    
+                    Console.WriteLine();
+                    DisplayPlayGround(currentPlayer.ShotsTaken, true, "This is the target ground:");
+                    Console.WriteLine();
+                    DisplayPlayGround(currentPlayer.FriendlyShips, false, "This is the home ground:");
+                    Console.WriteLine();
 
-                    DisplayPlayGround(currentPlayer.ShotsTaken, true, "target ground:");
-                    DisplayPlayGround(currentPlayer.FriendlyShips, false, "home ground:");
                     // ask for coordinates to take the shot                    
                     GridSpotModel strikeSpot = AskForCoordinates(currentPlayer.ShotsTaken, true);
                     bool isHit = GameLogic.TakeShot(currentPlayer, strikeSpot);
+
+                    WaitForInput("Press enter to continue.");
+
                     if (isHit)
                     {
-                        //Console.Clear();
-                        Console.WriteLine("\nCongratulations! That's a HIT!\n");
-                        DisplayPlayGround(currentPlayer.ShotsTaken, true, "new target ground:");
-                        isGameOver = EndTurn();
+                        // display feedback
+                        Console.WriteLine("Congratulations! That's a HIT!");
                     }
                     else
                     {
-                        //Console.Clear();
-                        Console.WriteLine("\nBummer! That's a MISS!\n");
-                        DisplayPlayGround(currentPlayer.ShotsTaken, true, "new target ground:");
-                        isGameOver = EndTurn();
+                        // display feedback
+                        Console.WriteLine("Bummer! That's a MISS!");
                     }
 
-                    //PrintFriendlyShips(currentPlayer, playerNo);
+                    DisplayLegend();
+                    Console.WriteLine();
 
-                    if (isGameOver)
+                    // display new target ground
+                    DisplayPlayGround(currentPlayer.ShotsTaken, true, "This is the updated target ground:");
+
+                    // end turn and check if the game is over
+                    WaitForInput("Press enter to end turn.");
+                    if (GameLogic.IsGameOver)
                     {
+                        GameLogic.Winner = currentPlayer;
                         break;
                     }
                 }
-                turnNumber++;
+
+                // only increment TurnNumber if the game is still running after all players have taken their turn
+                if (!GameLogic.IsGameOver)
+                {
+                    GameLogic.TurnNumber++;
+                }
             }
 
-            ShowVictoryMessage();
-            //DisplayTargetGround(GameLogic.Players[0].ShotsTaken);
-            return isGameOver;
+            ShowVictoryMessage(GameLogic.Winner, playerNo);
+
         }
 
-        private static bool EndTurn()
+        private static void WaitForInput(string message)
         {
-            Console.Write("\nPress enter to end turn.");
+            Console.WriteLine();
+            Console.Write(message);
             Console.ReadLine();
             Console.Clear();
-            return GameLogic.IsPlayerDead;
         }
 
-        private static void ShowVictoryMessage()
+        private static void ShowVictoryMessage(PlayerModel winner, ushort playerNo)
         {
             Console.Clear();
-            Console.WriteLine("Congratulations! You WON!");
+            Console.WriteLine($"Congratulations, Player{playerNo + 1}! You WON!\n");
+            Console.WriteLine($"The game lasted {GameLogic.TurnNumber} turns.");
+            PrintFriendlyShips(winner, playerNo);
+            PrintShotsTaken(winner, playerNo);
         }
 
         public static void ExitGame()
         {
-            Console.WriteLine("Press enter to exit game.");
-            Console.ReadLine();
+            WaitForInput("Press enter to exit game.");
         }
 
         private static void DisplayPlayGround(List<GridSpotModel> spots, bool isTarget, string message)
         {
-            Console.WriteLine($"This is the {message}");            
-            ushort i = 0;
-            ushort currentNumber = 0;
+            Console.WriteLine(message);            
+            ushort currentLine = 0;
+            ushort currentColumn = 0;
             ushort numberOflines = ProcessGridSpot.FromLetterToNumber(GameLogic.MaxNumberOfLines);
             ushort numberOfColumns = GameLogic.MaxNumberOfColumns;
-            for (i = 0; i <= numberOflines; i++)
+            for (currentLine = 0; currentLine <= numberOflines; currentLine++)
             {
-                char currentLetter = ProcessGridSpot.FromNumberToLetter(i);
-                for (currentNumber = 0; currentNumber <= numberOfColumns; currentNumber++)
+                char currentLetter = ProcessGridSpot.FromNumberToLetter(currentLine);
+                for (currentColumn = 0; currentColumn <= numberOfColumns; currentColumn++)
                 {
-                    if (i == 0)
+                    if (currentLine == 0)
                     {
-                        if (currentNumber == 0)
+                        if (currentColumn == 0)
                         {
+                            // matrix [0][0] displays whitspace
                             Console.Write("  ");
                         }
                         else
                         {
-                            Console.Write($"{currentNumber} ");
+                            // matrix [0][1...n] displays the number of columns
+                            Console.Write($"{currentColumn} ");
                         }
                     }
                     else
                     {
-                        if (currentNumber == 0)
+                        if (currentColumn == 0)
                         {
+                            // matrix [1...n][0] displays the number of lines as letters
                             Console.Write($"{currentLetter} ");
                         }
                         else
                         {
-                            //check if letter and number are found in list spot in targetedSpots
-                            GridSpotModel currentSpot = ProcessGridSpot.SpotFound(currentLetter, currentNumber, spots);
+                            //check if current letter and number are found in spots list (friendlyShips or shotsTaken)
+                            GridSpotModel currentSpot = ProcessGridSpot.FindSpot(currentLetter, currentColumn, spots);
                             {
-                                // if current spot is hit
-                                if (currentSpot.SpotLetter == currentLetter && currentSpot.SpotNumber == currentNumber)
+                                // if current spot is found in the list, it means that it's either: a hit, a ship or a miss
+                                if (currentSpot != null)
                                 {
                                     if (currentSpot.IsHit)
                                     {
                                         // display hit
                                         Console.Write($"{GameLogic.Hit} ");
-                                        continue;
                                     }
                                     else
                                     {
@@ -147,63 +165,67 @@ namespace BattleshipApp
                                         {
                                             // display missed
                                             Console.Write($"{GameLogic.Missed} ");
-                                            continue;
                                         }
                                         else
                                         {
                                             // display ship
                                             Console.Write($"{GameLogic.Ship} ");
                                         }
-
                                     }
-                                    
                                 }
                                 else
                                 {
                                     //display empty
                                     Console.Write($"{GameLogic.Empty} ");
-                                    continue;
-                                }
-                                    
+                                }  
                             }
                         }
                     }
                 }
+                // end of the line
                 Console.WriteLine();
             }
-            Console.WriteLine();
+        }
 
+        private static void DisplayLegend()
+        {
+           Console.WriteLine($"{GameLogic.Ship} - ship, {GameLogic.Hit} - hit, {GameLogic.Missed} - missed, {GameLogic.Empty} - Empty.");
         }
 
         private static void PrintFriendlyShips(PlayerModel player, ushort playerNo)
         {
             string output = $"Player{playerNo + 1} ship positions are: ";
-            foreach (GridSpotModel spot in player.FriendlyShips)
-            {
-                output += $"{spot.SpotLetter}{spot.SpotNumber}, ";
-            }
-            output = output.Substring(0, output.Length - 2);
+            output += ProcessPlayerModel.SpotListToString(player.FriendlyShips);
+            Console.WriteLine(output);
+        }
+
+        private static void PrintShotsTaken(PlayerModel player, ushort playerNo)
+        {
+            string output = $"Player{playerNo + 1} shots taken are: ";
+            output += ProcessPlayerModel.SpotListToString(player.ShotsTaken);
             Console.WriteLine(output);
         }
 
         private static PlayerModel CreatePlayer(ushort playerNo)
         {
-            PlayerModel newPlayer = new PlayerModel();
+            Console.WriteLine($"Hello, Player{playerNo + 1}!");
+            Console.WriteLine();
+            List<GridSpotModel> friendlyShips = PlaceShips();
 
-            Console.WriteLine($"Hello, Player{playerNo}!");
-            // No shots taken yet
-            newPlayer.ShotsTaken = new List<GridSpotModel>();
-            // Ask player for their ship placements
-            newPlayer.FriendlyShips = PlaceShips(playerNo);          
-            
+            PlayerModel newPlayer = ProcessPlayerModel.InitPlayer(friendlyShips);
+            GameLogic.Players.Add(newPlayer);
+
+            Console.WriteLine();
+            DisplayPlayGround(newPlayer.FriendlyShips, false, "This will be your homeground: ");
+
             return newPlayer;
         }
 
-        private static List<GridSpotModel> PlaceShips(ushort playerNo)
+        private static List<GridSpotModel> PlaceShips()
         {
             List<GridSpotModel> friendlyShips = new List<GridSpotModel>(PlayerModel.MaxNumberOfShips);
 
-            for (ushort battleshipNo = 1; battleshipNo <= PlayerModel.MaxNumberOfShips; battleshipNo++)
+            for (ushort battleshipNo = 0; battleshipNo < PlayerModel.MaxNumberOfShips; battleshipNo++)
             {
                 GridSpotModel newShip = AskForCoordinates(friendlyShips, false, battleshipNo);
                 friendlyShips.Add(newShip);
@@ -214,17 +236,18 @@ namespace BattleshipApp
 
         private static GridSpotModel AskForCoordinates(List<GridSpotModel> spots, bool isStrike, int shipNumber = 0)
         {
-            GridSpotModel spot = new GridSpotModel();
             if (isStrike)
             {
                 Console.Write($"Please input coordinates for the strike {letterRange}{numberRange}: ");
             }
             else
             {
-                Console.Write($"Please input the location of your  battleship no. {shipNumber} {letterRange}{numberRange}: ");
+                Console.Write($"Please input the location of your  battleship no. {shipNumber + 1} {letterRange}{numberRange}: ");
             }
+
             string input = Console.ReadLine();
-            spot = ExtractCoordinates(input);
+            GridSpotModel spot = ExtractCoordinates(input);
+
             while (ProcessGridSpot.IsSpotTaken(spots, spot))
             {
                 if (isStrike)
@@ -238,24 +261,26 @@ namespace BattleshipApp
                 input = Console.ReadLine();
                 spot = ExtractCoordinates(input);
             }
+
             return spot;
         }
 
         private static GridSpotModel ExtractCoordinates (string input)
         {
-            GridSpotModel output = new GridSpotModel();
-            Match match = ProcessGridSpot.IsValidInput(input);
-            while (!match.Success)
+            var result = GameLogic.IsValidSpot(input);
+
+            while (!result.isValid)
             {
                 Console.Write("Invalid input. Please try again: ");
                 input = Console.ReadLine();
-                match = ProcessGridSpot.IsValidInput(input);
+                result = GameLogic.IsValidSpot(input);
             }
-            output.SpotLetter = char.ToUpper(match.Groups[1].Value[0]);
-            output.SpotNumber = ushort.Parse(match.Groups[2].Value);
-            output.IsHit = false;
-            
+
+            GridSpotModel output = ProcessGridSpot.InitSpot(result.letter, result.number);
+
             return output;
         }
+
+
     }
 }
