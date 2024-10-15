@@ -1,9 +1,0 @@
-User
-User's name - string
-User's 5 ship locations - List<GridSpot>
-User's shot grid - List<GridSpot>
-
-GridSpot
-SpotLetter - string
-SpotNumber - int
-Status - string (maybe enum)
